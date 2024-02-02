@@ -1,5 +1,5 @@
 ---
-title: GardenWizard 
+title: GardenBuddy - Optimierungen 
 subtitle: Qualifikationsschritt M2 (HSLU CAS MSED)
 author:
 - Gallus Bühlmann <gallus.buehlmann@stud.hslu.ch>
