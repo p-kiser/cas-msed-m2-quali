@@ -15,11 +15,11 @@ Im Rahmen der Transferarbeit für den CAS *«Modern Software Engineering & Devel
 
 ## Grundlagen der Gartenplanung
 
-Ein Gartenbeet besteht (in der Regel) aus mehreren Reihen, welche wiederum mit verschiedenen Gemüsesorten bepflanzt werden können. Das Wachstum der Pflanzen hängt dabei von zahlreichen verschiedenen Faktoren ab, wobei meisten davon mit der Position innerhalb eines Gartenbeets zu tun haben:
+Ein Gartenbeet besteht (in der Regel) aus mehreren Reihen, welche wiederum mit verschiedenen Gemüsesorten bepflanzt werden können. Das Wachstum der Pflanzen hängt dabei von zahlreichen verschiedenen Faktoren ab, wobei die meisten davon mit der Position innerhalb eines Gartenbeets zu tun haben:
 
 1) Direkte Nachbarschaftbeziehungen:
 
-Eine Pflanzen beeinflussen das Wachstum ihrer Nachbarn positiv, andere wirken sich negativ aus bestimmte Nachbarn aus. Die Lösung für dieses Problem sind sogenannte *Mischkulturen*: der gleichzeitige Anbau verschiedener Gemüsesorten, die sich idealerweise gegeneitig begünstigen.
+Einige Pflanzen beeinflussen das Wachstum ihrer Nachbarn positiv, andere wirken sich negativ auf bestimmte Nachbarn aus. Die Lösung für dieses Problem sind sogenannte *Mischkulturen*: der gleichzeitige Anbau verschiedener Gemüsesorten, die sich idealerweise gegeneitig begünstigen.
 
 Als Veranschaulichung soll hier ein Satz aus der Einleitung unserer Transferarbeit dienen:
 
@@ -41,9 +41,9 @@ Bestimmte Pflanzen haben noch zusätzliche Vorlieben, wenn es um ihre Position i
 
 ## Schwierigkeiten der Gartenplanung
 
-Für Fruchtfolgen, Mischkulturen usw. gibt es zahlreiche verschiedene Modelle und Ansätze, wie verschiedene Gemüsesorten kombiniert werden sollen oder eben nicht. Wenn sich der Gärtner für ein entsprechendes Modell entschieden hat, oder seine eigene Kombination verschieder Modelle ausgearbeitet hat, fängt die eigentliche Planungsarbeit erst richtig an: auf Papier werden Beete gezeichet und Gemüse plaziert, Nachbarschaftsbeziehungen in Büchern nachgeschlagen und Gemüse umplatziert, bis der erschöpfte Hobbygärtner mit seinem Plan zufrieden ist.
+Für Fruchtfolgen, Mischkulturen usw. gibt es zahlreiche verschiedene Modelle und Ansätze, wie verschiedene Gemüsesorten kombiniert werden sollen oder eben nicht. Wenn sich der Gärtner für ein entsprechendes Modell entschieden hat, oder seine eigene Kombination verschieder Modelle ausgearbeitet hat, fängt die eigentliche Planungsarbeit erst richtig an: auf Papier werden Beete gezeichnet und Gemüse platziert, Nachbarschaftsbeziehungen in Büchern nachgeschlagen und Gemüse umplatziert, bis der erschöpfte Hobbygärtner mit seinem Plan zufrieden ist.
 
-Ob er den optimalen Plan ausgearbeitet hat, wird der Gärtner auf diese Weise vermutlich nie herausfinden, sofern sein Garten grösser ist als ein paar wenige Reihen. Grund dafür ist, dass die Zahl der möglichen Anordnungen (Permutationen) mit zunehmender Anzahl Elemente stark zunimmt.
+Ob er den optimalen Plan ausgearbeitet hat, wird der Gärtner auf diese Weise vermutlich nie herausfinden, sofern sein Garten nicht grösser ist als ein paar wenige Reihen. Grund dafür ist, dass die Zahl der möglichen Anordnungen (Permutationen) mit zunehmender Anzahl Elemente stark zunimmt.
 
 Die Anzahl Permutationen für $n$ Elemente lässt sich folgendermassen berechnen, wenn verschiedene Elemente (Gemüsesorten) mehrfach vorkommen (Permutation mit Wiederholung):
 
@@ -60,7 +60,7 @@ P(n) = n!
 $$
 
 
-Bei zwei oder drei Beet-Reihen kann man sich die möglichen Kombinationen vielleicht noch im Kopf durchdenken, aber ab vier ist vermutlich mit Sicherheit auf ein Papier angewiesen, ab fünf wird braucht man breits Rückseite und 6 oder mehr Reihen kann man ohne Hilfsmittel innerhalb einer Gartensaison nicht vernünftig planen.
+Bei zwei oder drei Beet-Reihen kann man sich die möglichen Kombinationen vielleicht noch im Kopf durchdenken, aber ab vier ist man vermutlich auf ein Papier angewiesen, ab fünf braucht man bereits die Rückseite und 6 oder mehr Reihen kann man ohne Hilfsmittel innerhalb einer Gartensaison nicht vernünftig planen.
 
 Im Rahmen der Transferarbeit haben wir einen Prototyp für ein solches Hilfsmittel ausgearbeitet.
 
@@ -101,7 +101,7 @@ Aufgrund der Implementierung kommt das System aber relativ schnell an seine Gren
         sort(allBeds)
         return allBeds[0]
 
-Die Erstellen einer Liste mit allen Permutation kann relativ einfach rekursiv gelöst werden:
+Die Erstellung einer Liste mit allen Permutation kann relativ einfach rekursiv gelöst werden:
 
     function permutations(lst):
         if length(lst) == 0:
@@ -117,7 +117,7 @@ Die Erstellen einer Liste mit allen Permutation kann relativ einfach rekursiv ge
 
 ## Variante 1: PHP
 
-Die Backend der Webapplikation ist mit dem PHP-Framework Laravel umgesetzt, weshalb die erste Version direkt als Laravel Controller in PHP geschrieben wurde. Die Input-Daten kommen über einen POST Request (als Liste von Gemüse-IDs) rein und der Controller gibt als Response die Permutation mit der höchsten Punktzahl zurück.
+Das Backend der Webapplikation ist mit dem PHP-Framework Laravel umgesetzt, weshalb die erste Version direkt als Laravel Controller in PHP geschrieben wurde. Die Input-Daten kommen über einen POST Request (als Liste von Gemüse-IDs) rein und der Controller gibt als Response die Permutation mit der höchsten Punktzahl zurück.
 
 Die Funktion zum erstellen aller Arrays sieht im Projekt etwa so aus:
 
@@ -138,7 +138,7 @@ function permRec($array)
 }
 ```
 
-PHP hat eine Einstellung `max_nesting_level`, welche hier relativ schnell zu einem Problem wurde. Diesen Wert kann man in der Konfiguration natürlich beliebig erhöhen, ist aber nur bedingt eine Lösung.
+PHP hat eine Einstellung `max_nesting_level`, welche hier relativ schnell zu einem Problem wurde. Diesen Wert kann man in der Konfiguration natürlich beliebig erhöhen. Dies ist aber nur bedingt eine Lösung.
 
 Wenn man die Permutationen nicht mehr rekursiv, sondern iterativ erstellt, sieht das in PHP etwa so aus[^2]:
 
@@ -209,7 +209,7 @@ Zum Beispiel:
     $ php perm.php I 10
     I: 3628800 permutations in 5.956723439 seconds
 
-Wenn man das Memory Limit hoch genug gesetzt wird, dann steigt naheliegenderweise die Verarbeitungzeit, was irgendwann zu einem Timeout beim POST Request in Laravel führt.
+Wenn das Memory Limit hoch genug gesetzt wird, dann steigt naheliegenderweise die Verarbeitungzeit, was irgendwann zu einem Timeout beim POST Request in Laravel führt.
 
 ## Variante 2: Rust
 
@@ -224,22 +224,24 @@ Eine einfache Lösung wäre die Verwendung einer Programmiersprache, die etwas p
     $ ./perm I 12
     I: 479001600 permutations in 60.636729915 seconds
 
-Der iterative Ansatz schneidet hier besser ab, was vermutlich auf auf bessere Compiler-Optimierungen zurückzuführen ist. Mit diesem Ansatz lassen sich Inputs von der Grundsätzlich scheint das aber noch nicht die Lösung für unser Problem zu sein.
+Der iterative Ansatz schneidet hier besser ab, was vermutlich auf bessere Compiler-Optimierungen zurückzuführen ist. Grundsätzlich scheint das aber noch nicht die Lösung für unser Problem zu sein.
 
 Der Code dazu ist im Verzeichnis `source/rust` abgelegt.
 
 Die Erkenntnisse aus Variante 1 und 2 sind somit:
 
 - Mit der Zuweisung von mehr Arbeitsspeicher (Variante 1) oder der effizienteren Verwendung des Arbeitsspeichers (Variante 2) können nur minimale Verbesserungen erzielt werden.
-- Die maximale Grösse des Inputs is limitiert durch die Grösse des resultierenden Arrays, welches alle Permutation enthält.
+- Die maximale Grösse des Inputs ist limitiert durch die Grösse des resultierenden Arrays, welches alle Permutation enthält.
 - Mit grösseren Inputs steigt die Verarbeitungszeit stark an, weshalb eine synchrone Verarbeitung des Requests vermutlich kein geeigneter Ansatz ist.
 
 Für unsere Implementierung bedeutet das, dass wir an verschiedenen Punkten ansetzen können:
 
-1. Parallelisierung, was aber bei diesem Algorithmus nicht ganz einfach ist, aufgrund er Abhängigkeiten zwischen den Iterationen.
+1. Parallelisierung, was aber bei diesem Algorithmus nicht ganz einfach ist, aufgrund der Abhängigkeiten zwischen den Iterationen.
 2. Es müssen nicht zwingend alle Permutationen auf einmal erstellt und in einer Variable abgelegt werden. Die einzelen Permutation sollten einzeln oder Batch-weise erzeugt und verarbeitet werden. Dadurch ergeben sich auch wieder weitere Möglichkeiten zur Palallierung.
 
-## Variante 2: Haskell
+\newpage
+
+## Variante 3: Haskell
 
 Eine Möglichkeit, Werte aus einer langen (oder sogar unendlichen) Liste zu verarbeiten, ist *Lazy Evaluation*. Gemeint ist damit eine Art der Auswertung von Ausdrücken, bei denen das Ergebnis nur und erst dann berechnet wird, wenn es benötigt wird. Dadurch wird es beispielsweise möglich eine unendlich lange Liste zu verarbeiten.
 
@@ -277,16 +279,17 @@ Die Resultate sind insofern interessant, als dass es nicht mehr zu einem Abbruch
     λ: 479001600 permutations in 8.75207300 seconds
     $ ./perm 13
     λ: 6227020800 permutations in 121.11810000 seconds
+    λ: 87178291200 permutations in 1871.11263400 seconds
 
 Egal wie gross der Input ist, das Progamm wird nicht mehr abstürzen wie bisher. Damit ist die Verarbeitung zwar nicht schneller als vorher, aber zumindest in der Länge des Inputs theoretisch nicht mehr durch Memory-Limitationen beschränkt.
 
 # Fazit
 
-Die Limitation betreffend Rekursionstiefe, Arbeitsspeicher und Verarbeitungszeit sind im Kontext von Laravel und PHP durchaus sinnvoll. Ein einzelner Request ans Backend sollte idealerweise nicht alle Ressourcen des Servers beanspruchen können. Eine synchrone Verarbeitung des Requests ist aufgrund der der langen Verarbeitungszeit ebenfalls nicht ideal.
+Die Limitation betreffend Rekursionstiefe, Arbeitsspeicher und Verarbeitungszeit sind im Kontext von Laravel und PHP durchaus sinnvoll. Ein einzelner Request ans Backend sollte idealerweise nicht alle Ressourcen des Servers beanspruchen können. Eine synchrone Verarbeitung des Requests ist aufgrund der langen Verarbeitungszeit ebenfalls nicht ideal.
 
 Mit Lazy Evaluation oder einer Art Generator-Funktion, welche nur die gerade benötigen Permutation erzeugt und zur Verarbeitung übergibt, können Probleme mit begrenztem Arbeitsspeicher gelöst werden, aber die Verarbeitungszeit ist bei grösseren Input immer noch hoch.
 
-Durch die Verarbeitung der Permutationen als Lazy List oder als Stream ergeben aber einige Möglichkeiten, um die User Experience für den auf Resultate wartenden Gärtner zu verbessern. Resultate können beispielsweise in einen Key-Value-Store geschrieben werden und und dem User alle paar Sekunden die aktuell beste Lösung angezeigt werden. Wenn eine Lösung "gut genug" ist, kann die Verarbeitung auch durch den Benutzer abgebrochen werden.
+Durch die Verarbeitung der Permutationen als Lazy List oder als Stream ergeben sich aber einige Möglichkeiten, um die User Experience für den auf Resultate wartenden Gärtner zu verbessern. Resultate können beispielsweise in einen Key-Value-Store geschrieben werden und und dem User alle paar Sekunden die aktuell beste Lösung angezeigt werden. Wenn eine Lösung "gut genug" ist, kann die Verarbeitung auch durch den Benutzer beendet werden.
 
 Die Verarbeitung längerer Listen auf diese Art bietet auch weitere Optimierungsmöglichkeiten, indem die vorzu erzeugten Permutation beispielsweise in eine Queue geschrieben und von mehreren Consumern parallel verarbeitet werden (den Score berechnen). Dadurch lässt sich zumindest ein Teil der Berechnung sehr einfach parallelisieren.
 
