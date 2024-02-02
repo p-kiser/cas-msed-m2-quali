@@ -245,12 +245,40 @@ Eine Möglichkeit, Werte aus einer langen (oder sogar unendlichen) Liste zu vera
 
 Eine Programmiersprache, die bekannt dafür ist, Lazy Evaluation einzusetzen ist Haskell.
 
+
+Der interessante Teil des Codes sieht so aus:
+
+```haskell
+import Data.List (permutations)
+import Data.Time.Clock (getCurrentTime, diffUTCTime)
+import Text.Printf
+
+-- Define a lazy stream of permutations
+permStream :: [a] -> [[a]]
+permStream = permutations
+
+let inputList = [1..lengthInput]
+let allPerms = permStream inputList
+let count = length allPerms
+putStr $ "λ: " ++ show count ++ " permutations"
+stop <- getCurrentTime
+let delta = diffUTCTime stop start
+let timeTaken = realToFrac delta :: Double
+putStrLn $ " in " ++ printf "%.8f" timeTaken ++ " seconds"
+```
+
+Die Umsetzung war erstaunlich einfach, sogar für jemanden der bisher noch nie mit Haskell gearbeitet hat. Das einzige, was nicht auf Anhieb funktionierte, war die Messung der Zeit in Sekunden. Wenn die End-Zeit wie bei den anderen Implementation direkt nach dem Erstellen der Permutationen gemessen wird, dann bekommt man kein sinnvolles Resultat. Grund dafür ist, dass hier der Stream eben nur für die Ausgabe von `count` benötigt wird und deshalb erst dann ausgewertet.
+
+Die Resultate sind insofern interessant, als dass es nicht mehr zu einem Abbruch kommt:
+
+    $ ./perm 11
+    λ: 39916800 permutations in 0.79687400 seconds
     $ ./perm 12          
     λ: 479001600 permutations in 8.75207300 seconds
     $ ./perm 13
     λ: 6227020800 permutations in 121.11810000 seconds
 
-Damit ist die Verarbeitung zwar nicht schneller als vorher, aber zumindest in der Länge des Inputs theoretisch nicht mehr durch Memory-Limitationen beschränkt.
+Egal wie gross der Input ist, das Progamm wird nicht mehr abstürzen wie bisher. Damit ist die Verarbeitung zwar nicht schneller als vorher, aber zumindest in der Länge des Inputs theoretisch nicht mehr durch Memory-Limitationen beschränkt.
 
 # Fazit
 
