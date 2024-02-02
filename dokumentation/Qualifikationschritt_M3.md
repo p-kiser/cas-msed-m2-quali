@@ -101,7 +101,7 @@ Aufgrund der Implementierung kommt das System aber relativ schnell an seine Gren
         sort(allBeds)
         return allBeds[0]
 
-Die Erstellen einer Liste mit allen Permutation kann relativ einfach rekursiv gelöst werden:
+Die Erstellung einer Liste mit allen Permutation kann relativ einfach rekursiv gelöst werden:
 
     function permutations(lst):
         if length(lst) == 0:
