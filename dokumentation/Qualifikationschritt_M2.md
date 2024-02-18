@@ -11,7 +11,16 @@ author:
 
 # Ausgangslage
 
-Im Rahmen der Transferarbeit für den CAS *«Modern Software Engineering & Development»* haben wir eine Webapplikation für Hobbygärtner entwickelt. Die Applikation soll den Gärtner insbesondere bei der Planung der zu beflanzenden Gartenbeete unterstützen.
+Im Rahmen der Transferarbeit für den CAS *«Modern Software Engineering & Development»* haben wir eine Webapplikation für Hobbygärtner entwickelt. Die Applikation soll den Gärtner insbesondere bei der Planung der zu beflanzenden Gartenbeete unterstützen. Die Idee ist grundsätzlich die folgende:
+
+- Der Benutzer erfasst seinen Garten im App (Anzahl und Grösse der Beete)
+- Daraus ergibt sich wie viele Plätze im Garten verfügbar sind, um Gemüse anzupflanzen
+- Der Benutzer wählt anschliessend Gemüsesorten aus, bis alle Plätze besetzt sind. Wiederholungen sind erlaubt, d.h. der Benutzer kann eine Gemüsesorten auch mehrmals auswählen.
+- Auf Knopfdruck gibt das System dann einen oder mehrere Vorschläge aus, wie die vom Benutzer ausgewählten Gemüsesorten idealerweise angeordnet werden sollten. Es sollen alle vom Benutzer gewählten Gemüsesorten in der vom Benutzer vorgegebenen Anzahl verwendet werden, auch wenn dadurch keine "gute" Lösung möglich ist. Das Resultat ist einfach die bestmögliche Anordnung basierend auf dem Input.
+
+Die zur Auswahl stehenden Gemüsesorten und die Daten dazu kommen aus einer Datenbank und die Berechnung der optimalen Anordnung basiert auf verschiedenen vordefinierten Regeln, welche für den Benutzer nicht zwingend ersichtlich oder komplett nachvollziehbar sein müssen.
+
+Ziel der Transferarbeit war es, mit wenigen Gemüsesorten und wenigen Regeln einen ersten, einfachen aber erweiterbaren Prototyp zu bauen, dem später weitere Regeln hinzugefügt werden können. Ziel dieser Arbeit ist es, das aktuell grösste Problem des Prototyps zu analysieren und einige Erkenntnisse zu gewinnen, wie damit umgegangen werden kann.
 
 ## Grundlagen der Gartenplanung
 
@@ -41,7 +50,7 @@ Bestimmte Pflanzen haben noch zusätzliche Vorlieben, wenn es um ihre Position i
 
 ## Schwierigkeiten der Gartenplanung
 
-Für Fruchtfolgen, Mischkulturen usw. gibt es zahlreiche verschiedene Modelle und Ansätze, wie verschiedene Gemüsesorten kombiniert werden sollen oder eben nicht. Wenn sich der Gärtner für ein entsprechendes Modell entschieden hat, oder seine eigene Kombination verschieder Modelle ausgearbeitet hat, fängt die eigentliche Planungsarbeit erst richtig an: auf Papier werden Beete gezeichnet und Gemüse platziert, Nachbarschaftsbeziehungen in Büchern nachgeschlagen und Gemüse umplatziert, bis der erschöpfte Hobbygärtner mit seinem Plan zufrieden ist.
+Für Fruchtfolgen, Mischkulturen usw. gibt es zahlreiche verschiedene Modelle und Ansätze, wie verschiedene Gemüsesorten kombiniert werden sollen oder eben nicht. Wenn sich der Gärtner für ein entsprechendes Modell entschieden hat, oder seine eigene Kombination verschiedener Modelle ausgearbeitet hat, fängt die eigentliche Planungsarbeit erst richtig an: auf Papier werden Beete gezeichnet und Gemüse platziert, Nachbarschaftsbeziehungen in Büchern nachgeschlagen und Gemüse umplatziert, bis der erschöpfte Hobbygärtner mit seinem Plan zufrieden ist.
 
 Ob er den optimalen Plan ausgearbeitet hat, wird der Gärtner auf diese Weise vermutlich nie herausfinden, sofern sein Garten nicht grösser ist als ein paar wenige Reihen. Grund dafür ist, dass die Zahl der möglichen Anordnungen (Permutationen) mit zunehmender Anzahl Elemente stark zunimmt.
 
@@ -81,6 +90,14 @@ Im Rahmen der Transferarbeit haben wir einen Prototyp für ein solches Hilfsmitt
 |   12 |  479001600 |
 |   13 | 6227020800 |
 
+## Einschränkungen bezüglich Optimierungen
+
+Eine naheliegende Optimierung wäre hier, die Anzahl der zu verarbeitenden Permutationen zu reduzieren, beispielsweise indem man gewisse Anordnungen bereits zu Beginn verwirft. In der aktuell umgesetzten Variante werden nur Nachbarschaftsbeziehungen berücksichtigt, was dazu führt, dass gespiegelte Anordnungen (`abc` und `cba`) auch immer die gleiche Punktzahl haben. Weil aber in Zukunft weitere Regeln dazukommen sollen, welche eben nicht symmetrisch sind (Nord-Süd-Ausrichtung, Fruchtfolge etc.) wurde darauf verzichtet. Falls zu einem späteren Zeitpunkt klar werden sollte, dass gewisse Kombinationen tatsächlich nie berücksichtigt werden müssen, können diese dann immer noch ausgefiltert werden. Aktuell gehen wir aufgrund der Erweiterbarkeit des Regelsets zur Punkteberechnung vom "Worst-Case" aus, d.h. alle möglichen Permutation müssen berücksichtigt werden.
+
+Grundsätzlich können "schlechte" Paare, also Kombinationen innerhalb einer Permutation mit besonders negativen Beziehungen untereinander können auch nicht einfach aussortiert werden. Eventuell gibt es ja in dieser Benutzerauswahl nur schlechte Beziehungen, trotzdem sollte das bestmögliche Resultat angezeigt werden. Oder das "schlechte Pärchen" ist nötig, um ein anderes, "gutes" Pärchen zu ermöglichen. Allenfalls liessen sich die einzelnen Permutationen anders priorisieren, d.h. Permutation mit schlechten Kombinationen weiter nach hinten in die Verarbeitungsqueue geschoben. Die effektive Anzahl zu verarbeitender Permutation lässt sich so aber vermutlich nicht sinnvoll reduzieren, ohne dass die Erweiterbarkeit der Regeln für die Punkteberechnung beeinträchtigt wird.
+ 
+Aus diesen Gründen wird nachfolgend von der Annahme ausgegangen, dass jeweils alle Permutationen betrachtet werden müssen.
+
 \newpage
 
 # Implementierung
@@ -89,7 +106,7 @@ Der oben erwähnte Prototyp kann bereits einiges. Ein Benutzer kann sich registr
 
 Aktuell werden zwar nur die Nachbarschaftsbeziehungen berücksichtigt, aber das Datenmodell ist so konzipiert, dass später weitere Faktoren relativ einfach ergänzt werden könnten.
 
-Aufgrund der Implementierung kommt das System aber relativ schnell an seine Grenzen. Je nach Konfiguration der Umgebung können momentan etwa 9 bis 10 Beetreihen berechnet werden. Grund dafür ist die Art, wie die Berechung des optimalen Beets aktuell gemacht wird. In Pseudocode sieht das in etwa so aus:
+Aufgrund der Implementierung kommt das System aber relativ schnell an seine Grenzen. Je nach Konfiguration der Umgebung können momentan etwa 9 bis 10 Beetreihen berechnet werden. Grund dafür ist die Art, wie die Berechnung des optimalen Beets aktuell gemacht wird. In Pseudocode sieht das in etwa so aus:
 
 
     function getOptimalBed(input)
