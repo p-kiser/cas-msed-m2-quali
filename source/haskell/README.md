@@ -1,5 +1,9 @@
 # Permutations (Haskell)
 
+Prerequisites:
+
+    - Install [Haskell](https://www.haskell.org/downloads/)
+
 Build:
 
     ghc -o perm perm.hs && ./perm

@@ -1,5 +1,9 @@
 # Permutations (PHP)
 
+Prerequisites:
+
+ - Install [PHP](https://www.php.net/manual/en/install.php)
+
 Run:
 
     php perm.php MODE SIZE

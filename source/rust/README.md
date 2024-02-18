@@ -1,5 +1,9 @@
 # Permutations (Rust)
 
+Prerequisites:
+
+ - Install [Rust](https://www.rust-lang.org/tools/install)
+
 Build:
 
     rustc -C opt-level=3 perm.rs

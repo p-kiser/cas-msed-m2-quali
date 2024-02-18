@@ -279,6 +279,7 @@ Die Resultate sind insofern interessant, als dass es nicht mehr zu einem Abbruch
     λ: 479001600 permutations in 8.75207300 seconds
     $ ./perm 13
     λ: 6227020800 permutations in 121.11810000 seconds
+    $ ./perm 13
     λ: 87178291200 permutations in 1871.11263400 seconds
 
 Egal wie gross der Input ist, das Progamm wird nicht mehr abstürzen wie bisher. Damit ist die Verarbeitung zwar nicht schneller als vorher, aber zumindest in der Länge des Inputs theoretisch nicht mehr durch Memory-Limitationen beschränkt.
