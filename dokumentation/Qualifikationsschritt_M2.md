@@ -102,7 +102,6 @@ Aus diesen Gründen wird nachfolgend von der Annahme ausgegangen, dass jeweils a
 
 # Implementierung
 
-
 Der oben erwähnte Prototyp kann bereits einiges. Ein Benutzer kann sich registrieren und einloggen, Gemüsebeete erfassen, die Anzahl Reihen pro Beet konfigurieren und verschiedene Gemüsesorten auswählen. Per Knopfdruck wird dann die ideale Zusammenstellung berechnet und dem Benutzer angezeigt.
 
 Aktuell werden zwar nur die Nachbarschaftsbeziehungen berücksichtigt, aber das Datenmodell ist so konzipiert, dass später weitere Faktoren relativ einfach ergänzt werden könnten.
@@ -132,8 +131,13 @@ Die Erstellung einer Liste mit allen Permutation kann relativ einfach rekursiv g
                 result.append(concatenate([current_element], p))
         return result
 
+Es handelt sich hier um den [Heap-Algorithmus](https://en.wikipedia.org/wiki/Heap%27s_algorithm). Im folgenden Abschnitt werden iterative und rekursive Implementation davon in verschiedenen Programmierpsrachen verglichen.
 
-## Variante 1: PHP
+# Programmiersprachen
+
+Aktuell wird die Berechnung über einen POST-Request im Laravel Backend angestossen und das Resultat in der Response zurückgeschickt. Als erstes soll geprüft werden, ob es in
+
+## Variante 1: PHP (Heap)
 
 Das Backend der Webapplikation ist mit dem PHP-Framework Laravel umgesetzt, weshalb die erste Version direkt als Laravel Controller in PHP geschrieben wurde. Die Input-Daten kommen über einen POST Request (als Liste von Gemüse-IDs) rein und der Controller gibt als Response die Permutation mit der höchsten Punktzahl zurück.
 
@@ -229,7 +233,7 @@ Zum Beispiel:
 
 Wenn das Memory Limit hoch genug gesetzt wird, dann steigt naheliegenderweise die Verarbeitungzeit, was irgendwann zu einem Timeout beim POST Request in Laravel führt.
 
-## Variante 2: Rust
+## Variante 2: Rust (Heap)
 
 Eine einfache Lösung wäre die Verwendung einer Programmiersprache, die etwas performanter ist als PHP, wie beispielsweise Rust. Die Resultate sind durchaus interessant, aber nur bedingt hilfreich:
 
@@ -255,15 +259,159 @@ Die Erkenntnisse aus Variante 1 und 2 sind somit:
 Für unsere Implementierung bedeutet das, dass wir an verschiedenen Punkten ansetzen können:
 
 1. Parallelisierung, was aber bei diesem Algorithmus nicht ganz einfach ist, aufgrund der Abhängigkeiten zwischen den Iterationen.
-2. Es müssen nicht zwingend alle Permutationen auf einmal erstellt und in einer Variable abgelegt werden. Die einzelen Permutation sollten einzeln oder Batch-weise erzeugt und verarbeitet werden. Dadurch ergeben sich auch wieder weitere Möglichkeiten zur Palallierung.
+2. Es müssen nicht zwingend alle Permutationen auf einmal erstellt und in einer Variable abgelegt werden. Die einzelnen Permutation sollten einzeln oder Batch-weise erzeugt und verarbeitet werden. Dadurch ergeben sich auch wieder weitere Möglichkeiten zur Parallelisierung.
 
 \newpage
 
-## Variante 3: Haskell
+# Algorithmen
+
+Den gleichen Algorithmus in einer schnelleren Programmiersprache umzusetzen hat nur relative kleine Verbesserungen gebracht. Allenfalls kann mit einem effizienteren Algorithmus ein besseres Resultat erzeugt werden.
+
+In diesem Abschnitt werden ein paar verschiedene Algorithmen mit dem oben beschriebenen Heap-Algorithmus verglichen.
+
+## Variante 3: Steinhaus–Johnson–Trotter
+
+Der Steinhaus-Johnson-Trotter Algorithmus ist ein Verfahren zur Erzeugung aller Permutationen einer Sequenz. Die darauffolgende Permutation wird jeweils aus der vorherigen erzeugt, durch den Austausch von zwei benachbarten Elemente.[^3] 
+
+Eine mögliche Implementation in PHP sieht so aus:
+
+```php
+function perms($callback, ...$elements) {
+    $perm = array_map(function($e) { return [$e, -1]; }, $elements);
+    $perm[0][1] = 0;
+
+    $sign = 1;
+    while (true) {
+        $callback($sign, array_map(function($e) { return $e[0]; }, $perm));
+        $sign *= -1;
+
+        $chosen = -1;
+        $index = -1;
+        foreach ($perm as $i => $p) {
+            if ($p[1] && $p[0] > $chosen) {
+                $chosen = $p[0];
+                $index = $i;
+            }
+        }
+        if ($index == -1) {
+            return;
+        }
+
+        $direction = $perm[$index][1];
+        $next = $index + $direction;
+
+        $temp = $perm[$index];
+        $perm[$index] = $perm[$next];
+        $perm[$next] = $temp;
+
+        if ($next <= 0 || $next >= count($perm) - 1) {
+            $perm[$next][1] = 0;
+        } elseif ($perm[$next + $direction][0] > $chosen) {
+            $perm[$next][1] = 0;
+        }
+
+        for ($i = 0; $i < $next; $i++) {
+            if ($perm[$i][0] > $chosen) {
+                $perm[$i][1] = 1;
+            }
+        }
+        for ($i = $next + 1; $i < count($perm); $i++) {
+            if ($perm[$i][0] > $chosen) {
+                $perm[$i][1] = -1;
+            }
+        }
+    }
+}
+```
+
+Das Skript kann folgendermassen aufgerufen werden:
+
+    cd source/php
+    php sjt.ph SIZE
+
+- `SIZE`: Grösse des Input-Arrays
+
+Zum Beispiel:
+
+    $ php sjt.php 10
+    SJT: 3628800 permutations in 4.771048526 seconds
+    $ php sjt.php 11
+    SJT: 39916800 permutations in 54.128168616 seconds
+    $ php sjt.php 12
+    SJT: 479001600 permutations in 702.255895271 seconds
+
+## Next Permutation Algorithm
+
+Ein weiterer Algorithmus zur Erzeugung von Permutationen ist der *Next Permutation Algorithm*, wie er beispielsweise im Buch "PHP Cookbook" beschrieben ist.[^4]
+
+Die Idee ist grundsätzlich die Gleiche: aus einer Permutation kann die nächste berechnet werden. ohne dass alle möglichen Permutationen gleichzeitig erstellt werden müssen.
+
+Der Code dazu ist im der Datei `source/php/next.php`zu finden und entspricht grundsätzlich dem Code aus dem O'Reilly-Kapitel, mit kleinen Anpassungen, damit es besser vergleichbar ist mit den anderen Skripts.
+
+```php
+function pc_next_permutation($p, $size)
+{
+    // slide down the array looking for where we're smaller than the next guy
+    for ($i = $size - 1; $p[$i] >= $p[$i + 1]; --$i) {
+    }
+
+    // if this doesn't occur, we've finished our permutations
+    // the array is reversed: (1, 2, 3, 4) => (4, 3, 2, 1)
+    if ($i == -1) {
+        return false;
+    }
+
+    // slide down the array looking for a bigger number than what we found before
+    for ($j = $size; $p[$j] <= $p[$i]; --$j) {
+    }
+
+    // swap them
+    $tmp = $p[$i];
+    $p[$i] = $p[$j];
+    $p[$j] = $tmp;
+
+    // now reverse the elements in between by swapping the ends
+    for (++$i, $j = $size; $i < $j; ++$i, --$j) {
+        $tmp = $p[$i];
+        $p[$i] = $p[$j];
+        $p[$j] = $tmp;
+    }
+
+    return $p;
+}
+```
+
+Das Skript kann folgendermassen aufgerufen werden:
+
+    cd source/php
+    php next.ph SIZE
+
+- `SIZE`: Grösse des Input-Arrays
+
+Zum Beispiel:
+
+    $ php next.php 9 
+    NEXT: 362880 permutations in 0.074430943 seconds
+    $ php next.php 10
+    NEXT: 3628800 permutations in 0.717634146 seconds
+    $ php next.php 11
+    NEXT: 39916800 permutations in 8.082986768 seconds
+    $ php next.php 12
+    NEXT: 479001600 permutations in 100.302703727 seconds
+
+Der wesentliche Unterschied zu den Heap-Versionen ist, dass nicht mehr alle Permutationen auf einmal erzeugt werden, sondern jeweils eine neue Permutation aus der vorhergehenden erzeugt wird. Dadurch werden die Probleme mit Memory & Rekursionstiefe vermieden, welche beim Heap-Algorithmus zu Problemen geführt hat. Mit diesem Algorithmus lassen sich beliebig grosse Listen verarbeiten, vorausgesetzt, man hat genug Zeit.
+
+Für unseren Anwendungsfall mit der Gartenplanung kann das durchaus interessant sein. Beispielsweise könnte für jede Permutation den Score berechnen und dann Permutation und Score in einem Key-Value-Store ablegen. Dem Benutzer können noch während die Berechnungen laufen jeweils die besten bereits ermittelten Resultate angezeigt werden, beispielsweise indem periodisch die besten Scores aus diesem Key-Value-Store geladen werden. Dadurch könnte man trotz langer oder sehr langer Berechnungsdauer dem Benutzer bereits Vorschläge anzeigen. Sobald einer auftaucht, der "gut genug" ist, kann die Verarbeitung gestoppt werden.
+
+Dieser Ansatz hat den Vorteil, dass man die maximale Anzahl Gemüsereihen nicht beschränken *muss*, weil sonst die Verarbeitung abbricht. Der Ansatz, dass man solange rechnet, bis man zufrieden ist mit dem Resultat (anstatt immer das Optimum zu suchen) entspricht auch dem Vorgehen, dass Hobbygärtner in der Regel anwenden, wenn sie ohne Computerunterstützung die Gartenplanung vornehmen. Mit Unterstützung des Computers lassen sich aber natürlich deutlich mehr Berechnungen in der gleichen Zeit durchführen.
+
+# Lazy Evalutation
 
 Eine Möglichkeit, Werte aus einer langen (oder sogar unendlichen) Liste zu verarbeiten, ist *Lazy Evaluation*. Gemeint ist damit eine Art der Auswertung von Ausdrücken, bei denen das Ergebnis nur und erst dann berechnet wird, wenn es benötigt wird. Dadurch wird es beispielsweise möglich eine unendlich lange Liste zu verarbeiten.
 
-Eine Programmiersprache, die bekannt dafür ist, Lazy Evaluation einzusetzen ist Haskell.
+## Variante 4: Haskell
+
+Eine Programmiersprache, die bekannt dafür ist, Lazy Evaluation einzusetzen, ist Haskell.
 
 
 Der interessante Teil des Codes sieht so aus:
@@ -310,9 +458,14 @@ Mit Lazy Evaluation oder einer Art Generator-Funktion, welche nur die gerade ben
 
 Durch die Verarbeitung der Permutationen als Lazy List oder als Stream ergeben sich aber einige Möglichkeiten, um die User Experience für den auf Resultate wartenden Gärtner zu verbessern. Resultate können beispielsweise in einen Key-Value-Store geschrieben werden und und dem User alle paar Sekunden die aktuell beste Lösung angezeigt werden. Wenn eine Lösung "gut genug" ist, kann die Verarbeitung auch durch den Benutzer beendet werden.
 
-Die Verarbeitung längerer Listen auf diese Art bietet auch weitere Optimierungsmöglichkeiten, indem die vorzu erzeugten Permutation beispielsweise in eine Queue geschrieben und von mehreren Consumern parallel verarbeitet werden (den Score berechnen). Dadurch lässt sich zumindest ein Teil der Berechnung sehr einfach parallelisieren.
+Die Verarbeitung längerer Listen auf diese Art bietet auch weitere Optimierungsmöglichkeiten, indem die vorzu erzeugten Permutation beispielsweise in eine Queue geschrieben und von mehreren Consumern parallel verarbeitet werden (den Score berechnen). Diese schreiben das Resulat wie oben beschrieben in eine Key-Value-Store.
 
-Insgesamt scheint das ein interessanter und vielversprechender Ansatz zu sein, welcher für diese Art von Problem zumindest vielversprechend ist.
+Insgesamt scheint das ein interessanter Ansatz zu sein, welcher für diese Art von Problem zumindest vielversprechend ist.
 
 [^1]: Bühlmann G., & Kiser P. (2024), *Prototyp GardenBuddy eine Machbarkeitsstudie*, Transferarbeit CAS MSED HSLU
+
 [^2]: Wikipedia. (2024, Januar 31). Heap's algorithm. https://en.wikipedia.org/wiki/Heap%27s_algorithm
+
+[^3]: Wikipedia. (2024, Februar 29). Steinhaus–Johnson–Trotter algorithm. https://en.wikipedia.org/wiki/Steinhaus%E2%80%93Johnson%E2%80%93Trotter_algorithm
+
+[^4]: PHP Cookbook, 4.25 Finding All Permutations of an Array. https://www.oreilly.com/library/view/php-cookbook/1565926811/ch04s26.html#phpckbk-CHP-4-EX-6

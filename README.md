@@ -21,6 +21,8 @@ Alle Codebeispiele sind im Verzeichnis `source` abgelegt zusammen mit einer kurz
             
         cd source/php
 
+#### Heap
+
 3. Skript ausführen:
 
         php perm.php MODE SIZE
@@ -29,6 +31,28 @@ Beispiel:
 
     php perm.php R 9
     R: 362880 permutations in 0.107521011 seconds
+
+#### SJT
+
+    php sjt.ph SIZE
+
+- `SIZE`: Grösse des Input-Arrays
+
+Zum Beispiel:
+
+    $ php sjt.php 10
+    SJT: 3628800 permutations in 4.771048526 seconds
+
+### Next
+
+    php next.ph SIZE
+
+- `SIZE`: Grösse des Input-Arrays
+
+Zum Beispiel:
+
+    $ php next.php 9 
+    NEXT: 362880 permutations in 0.074430943 seconds
 
 ### Rust
 
@@ -57,7 +81,6 @@ Beispiel:
 2. Ins Verzeichnis navigieren:
             
         cd source/haskell
-
 
 3. Code kompilieren:
 
