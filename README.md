@@ -54,7 +54,7 @@ Zum Beispiel:
     $ php next.php 9 
     NEXT: 362880 permutations in 0.074430943 seconds
 
-### Rust
+### Rust
 
 1. [Rust installieren](https://www.rust-lang.org/tools/install)
 2. Ins Verzeichnis navigieren:
