@@ -6,7 +6,7 @@ Prerequisites:
 
 Build:
 
-    ghc -o perm perm.hs && ./perm
+    ghc -o perm perm.hs
 
 Run:
 
