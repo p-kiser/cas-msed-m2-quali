@@ -2,9 +2,9 @@
 
 Github-Repository mit der Dokumentation und den Codebeispielen für den Qualifikationsschritt im Modul M2 für den CAS MSED (Modern Software Engineering & Development ) and der HSLU - Informatik.
 
-## Kurzbeschreibung
+## Kurzbeschreibung
 
-Im Rahmen der Transferarbeit für den CAS MSED haben wir eine für die Planung von Gartenarbeiten und -bepflanzung Webapplikation entwickelt. Ein Problem 
+Im Rahmen der Transferarbeit für den CAS MSED haben wir eine für die Planung von Gartenarbeiten und -bepflanzung Webapplikation entwickelt. Ein Problem des aktuellen Prototyps ist die ressourcenintensive Berechnung der optimalen Anordnung verschiedener Gemüsesorten in einem Gartenbeet. In dieser Arbeit sollen einige Ansätze geprüft werden, wie die maximale Anzahl Gemüsesorten erhöht werden kann. 
 
 ## Dokumentation
 
