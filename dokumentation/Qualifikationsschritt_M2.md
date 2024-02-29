@@ -448,17 +448,21 @@ Die Resultate sind insofern interessant, als dass es nicht mehr zu einem Abbruch
     $ ./perm 13
     λ: 87178291200 permutations in 1871.11263400 seconds
 
-Egal wie gross der Input ist, das Progamm wird nicht mehr abstürzen wie bisher. Damit ist die Verarbeitung zwar nicht schneller als vorher, aber zumindest in der Länge des Inputs theoretisch nicht mehr durch Memory-Limitationen beschränkt.
+Egal wie gross der Input ist, das Programm wird nicht mehr abstürzen wie bisher. Damit ist die Verarbeitung zwar nicht schneller als vorher, aber zumindest in der Länge des Inputs theoretisch nicht mehr durch Memory-Limitationen beschränkt.
 
 # Fazit
 
 Die Limitation betreffend Rekursionstiefe, Arbeitsspeicher und Verarbeitungszeit sind im Kontext von Laravel und PHP durchaus sinnvoll. Ein einzelner Request ans Backend sollte idealerweise nicht alle Ressourcen des Servers beanspruchen können. Eine synchrone Verarbeitung des Requests ist aufgrund der langen Verarbeitungszeit ebenfalls nicht ideal.
 
+Vor allem bei grösseren Listen ist es sinnvoll, Algorithmen zu verwenden, die nicht alle Permutationen auf einmal erzeugen, sondern mit jedem Aufruf die jeweils nächste Permutation zurückgeben.
+
 Mit Lazy Evaluation oder einer Art Generator-Funktion, welche nur die gerade benötigen Permutation erzeugt und zur Verarbeitung übergibt, können Probleme mit begrenztem Arbeitsspeicher gelöst werden, aber die Verarbeitungszeit ist bei grösseren Input immer noch hoch.
 
 Durch die Verarbeitung der Permutationen als Lazy List oder als Stream ergeben sich aber einige Möglichkeiten, um die User Experience für den auf Resultate wartenden Gärtner zu verbessern. Resultate können beispielsweise in einen Key-Value-Store geschrieben werden und und dem User alle paar Sekunden die aktuell beste Lösung angezeigt werden. Wenn eine Lösung "gut genug" ist, kann die Verarbeitung auch durch den Benutzer beendet werden.
 
-Die Verarbeitung längerer Listen auf diese Art bietet auch weitere Optimierungsmöglichkeiten, indem die vorzu erzeugten Permutation beispielsweise in eine Queue geschrieben und von mehreren Consumern parallel verarbeitet werden (den Score berechnen). Diese schreiben das Resulat wie oben beschrieben in eine Key-Value-Store.
+Die Verarbeitung längerer Listen auf diese Art bietet auch weitere Optimierungsmöglichkeiten, indem die vorzu erzeugten Permutation beispielsweise in eine Queue geschrieben und von mehreren Consumern parallel verarbeitet werden (den Score berechnen). Diese schreiben das Resultat wie oben beschrieben in eine Key-Value-Store.
+
+Ein Nachteil bei der Verwendung von Haskell ist, dass es sich nicht ohne weiteres in die bestehende Applikation einfügen lässt. Man müsste beispielsweise den Haskell-Code als eigener Webservice laufen lassen. Ein Problem hierbei ist die Berechnung des Scores, was unter anderem basierend auf Daten aus der SQL-Datenbank der Laravel-Applikation gemacht wird. Aus diesem Grund wäre die Verwendung PHP und die Einbettung der Logik in einen Laravel-Controller ein wesentlicher Vorteil. Mit dem Steinhaus–Johnson–Trotter- und Next-Permutation-Algorithmen können grundsätzlich beliebig lange Listen verarbeitet werden, weshalb die Verwendung von eines eigenen Webservices für die Verarbeitung der Permutationen vermutlich nicht notwendig ist.
 
 Insgesamt scheint das ein interessanter Ansatz zu sein, welcher für diese Art von Problem zumindest vielversprechend ist.
 
