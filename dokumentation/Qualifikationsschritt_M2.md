@@ -102,6 +102,7 @@ Aus diesen Gründen wird nachfolgend von der Annahme ausgegangen, dass jeweils a
 
 # Implementierung
 
+
 Der oben erwähnte Prototyp kann bereits einiges. Ein Benutzer kann sich registrieren und einloggen, Gemüsebeete erfassen, die Anzahl Reihen pro Beet konfigurieren und verschiedene Gemüsesorten auswählen. Per Knopfdruck wird dann die ideale Zusammenstellung berechnet und dem Benutzer angezeigt.
 
 Aktuell werden zwar nur die Nachbarschaftsbeziehungen berücksichtigt, aber das Datenmodell ist so konzipiert, dass später weitere Faktoren relativ einfach ergänzt werden könnten.
