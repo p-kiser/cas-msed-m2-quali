@@ -50,9 +50,8 @@ Beispiel:
     ./perm I 11                 
     I: 39916800 permutations in 4.149067326 seconds
 
-### Haskell
+### Haskell
 
-# Permutations (Haskell)
 
 1. [Haskell](https://www.haskell.org/downloads/)
 2. Ins Verzeichnis navigieren:
